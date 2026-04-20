@@ -1,0 +1,25 @@
+# Wired network Interface
+[Match]                                                                                                                                                                   
+Name=eth0
+
+[Network]
+
+# Use this for Static IPv4 config
+#Address=192.168.3.150/24
+#Gateway=192.168.3.1
+#DNS=192.168.3.1
+
+# Use this for Dynamic IPv4 config
+#DHCP=yes
+
+# IPv6 Link local IP only config (no SLACC)
+IPv6AcceptRA=false
+
+[DHCPv4]
+UseDomains=yes
+
+# Enable this if you use this interface for maintenance only
+# and use WLAN for Network access
+#[Link]
+#RequiredForOnline=no
+

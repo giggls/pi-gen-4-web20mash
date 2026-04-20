@@ -1,0 +1,22 @@
+# Wireless network Interface
+#
+#
+# Hint: Make sure to configure SSID and PSK in wpa_supplicant-wlan0.conf
+#
+#
+#
+[Match]                                                                                                                                           
+Name=wlan0
+
+[Network]
+
+# Use this for Static IPv4 config
+#Address=192.168.3.150/24
+#Gateway=192.168.3.1
+#DNS=192.168.3.1
+
+# Use this for Dynamic IPv4 config
+DHCP=yes
+
+[DHCPv4]
+UseDomains=yes

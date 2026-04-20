@@ -27,11 +27,11 @@
 ## Set up the keyboard layout. See localectl(1), in particular the various
 ## list-x11-* sub-commands, to determine the available models, layouts,
 ## variants, and options
-#keyboard:
-#  model: pc105
-#  layout: gb
-#  variant:
-#  options: ctrl:nocaps
+keyboard:
+  model: pc105
+  layout: de
+  variant: nodeadkeys
+  options: compose:caps
 
 # Controls password authentication with the SSH daemon; the default here can
 # prevent logging into SSH with a password. Changing this is a security risk
@@ -96,7 +96,26 @@
 #  owner: root:root
 #  permissions: '0644'
 
-## Run arbitrary commands at rc.local like time
-#runcmd:
-#- [ ls, -l, / ]
-#- [ sh, -xc, "echo $(date) ': hello world!'" ]
+## Finally prepare for readonly image:
+## * Mask unnecessary stuff like cron, timers and cloud-init
+## * Enable readonly mode and reboot.
+runcmd:
+- [ /usr/bin/systemctl, mask, cloud-init.target ]
+- [ /usr/bin/systemctl, mask, cloud-init-main.service ]
+- [ /usr/bin/systemctl, mask, cloud-init-local.service ]
+- [ /usr/bin/systemctl, mask, cloud-init-network.service ]
+- [ /usr/bin/systemctl, mask, modprobe@drm.service ]
+- [ /usr/bin/systemctl, mask, systemd-remount-fs.service ]
+- [ /usr/bin/systemctl, mask, cron.service ]
+- [ /usr/bin/systemctl, mask, apt-daily-upgrade.timer ]
+- [ /usr/bin/systemctl, mask, apt-daily.timer ]
+- [ /usr/bin/systemctl, mask, dpkg-db-backup.timer ]
+- [ /usr/bin/systemctl, mask, e2scrub_all.timer ]
+- [ /usr/bin/systemctl, mask, fstrim.timer ]
+- [ /usr/bin/systemctl, mask, logrotate.timer ]
+- [ /usr/bin/systemctl, mask, man-db.timer ]
+- [ /usr/bin/systemctl, mask, systemd-tmpfiles-clean.timer ]
+- [ /usr/bin/raspi-config, nonint, enable_bootro ]
+- [ /usr/bin/raspi-config, nonint, enable_overlayfs ]
+- [ /usr/bin/sleep, 2 ]
+- [ /sbin/reboot ]

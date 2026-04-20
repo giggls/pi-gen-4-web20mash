@@ -6,6 +6,8 @@ install -m 644 files/raspi.sources "${ROOTFS_DIR}/etc/apt/sources.list.d/"
 sed -i "s/RELEASE/${RELEASE}/g" "${ROOTFS_DIR}/etc/apt/sources.list.d/raspbian.sources"
 sed -i "s/RELEASE/${RELEASE}/g" "${ROOTFS_DIR}/etc/apt/sources.list.d/raspi.sources"
 
+install -m 644 files/web20mash.sources "${ROOTFS_DIR}/etc/apt/sources.list.d/"
+
 if [ -n "$APT_PROXY" ]; then
 	install -m 644 files/51cache "${ROOTFS_DIR}/etc/apt/apt.conf.d/51cache"
 	sed "${ROOTFS_DIR}/etc/apt/apt.conf.d/51cache" -i -e "s|APT_PROXY|${APT_PROXY}|"

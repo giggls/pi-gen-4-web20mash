@@ -9,4 +9,3 @@ fi
 # install meta-data file for NoCloud data-source to work
 install -v -m 755 files/meta-data "${ROOTFS_DIR}/boot/firmware/meta-data"
 install -v -m 755 files/user-data "${ROOTFS_DIR}/boot/firmware/user-data"
-install -v -m 755 files/network-config "${ROOTFS_DIR}/boot/firmware/network-config" 

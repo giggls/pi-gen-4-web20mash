@@ -1,0 +1,6 @@
+Types: deb
+URIs: http://geggus.net/debian/
+Suites: trixie
+Components: main
+Architectures: armhf
+Trusted: yes

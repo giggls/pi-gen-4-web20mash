@@ -18,7 +18,25 @@ if [ "${ENABLE_SSH}" == "1" ]; then
 else
 	systemctl disable ssh
 fi
+systemctl enable systemd-networkd
 EOF
+
+# systemd-networkd stuff
+mkdir -p "${ROOTFS_DIR}/etc/systemd/system/systemd-networkd.service.d"
+install -m 0644 files/override.conf "${ROOTFS_DIR}/etc/systemd/system/systemd-networkd.service.d/override.conf"
+mkdir "${ROOTFS_DIR}/boot/firmware/systemd-networkd"
+cp files/*.network "${ROOTFS_DIR}/boot/firmware/systemd-networkd/"
+cp files/wpa_supplicant-wlan0.conf "${ROOTFS_DIR}/boot/firmware/systemd-networkd/wpa_supplicant-wlan0.conf"
+on_chroot << EOF
+ln -s /boot/firmware/systemd-networkd/*.network /etc/systemd/network
+mkdir /etc/wpa_supplicant
+ln -s /boot/firmware/systemd-networkd/wpa_supplicant-wlan0.conf /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+# systemctl enable wpa_supplicant@wlan0.service:
+ln -s /usr/lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+EOF
+
+# load additional modules
+cat files/modules > "${ROOTFS_DIR}/etc/modules"
 
 if [ "${USE_QEMU}" = "1" ]; then
 	echo "enter QEMU mode"
@@ -33,7 +51,7 @@ on_chroot <<- EOF
 	for GRP in input spi i2c gpio; do
 		groupadd -f -r "\$GRP"
 	done
-	for GRP in adm dialout cdrom audio users sudo video games plugdev input gpio spi i2c netdev render; do
+	for GRP in adm dialout cdrom audio users sudo video games plugdev input gpio spi i2c render; do
 		adduser $FIRST_USER_NAME \$GRP
 	done
 EOF
@@ -63,3 +81,14 @@ EOF
 if [ -e "${ROOTFS_DIR}/etc/avahi/avahi-daemon.conf" ]; then
   sed -i 's/^#\?publish-workstation=.*/publish-workstation=yes/' "${ROOTFS_DIR}/etc/avahi/avahi-daemon.conf"
 fi
+
+# stuff for eb 2.0 Mash image
+install -m 644 files/99-lcd.rules "${ROOTFS_DIR}/etc/udev/rules.d/"
+mkdir "${ROOTFS_DIR}/etc/systemd/system/webmash.service.d"
+install -m 644 files/webmash.service.override.conf "${ROOTFS_DIR}/etc/systemd/system/webmash.service.d/override.conf"
+install -m 644 files/mashctld.conf "${ROOTFS_DIR}/etc/mashctld.conf"
+on_chroot << EOF
+  # group gpio does not exist yet on install time of web20mash
+  usermod -G gpio webmash
+EOF
+
